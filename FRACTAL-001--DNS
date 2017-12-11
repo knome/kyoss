@@ -1,0 +1,642 @@
+ 
+ ------------------------------------------------------------------------------
+ Information Technology
+ A Beautiful Fractal of Useful Lies
+ ------------------------------------------------------------------------------
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]]]> Subject I : The Domain Name System
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]> Purpose and Scope
+ 
+ The following is a high level lay overview of DNS. It doesn't discuss bit-level
+ minutia and glosses over plenty of technical points in favor of getting the
+ point across. If there are technical errors, please feel free to correct me and
+ I will update the information found here to reflect your additions. Thanks.
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]> Introduction
+ 
+ I've always found that the best way to understand a system is to review the
+ motivations for why that system was created and modified over time. When you
+ see the problems that were being solved, the warts and complexities of systems
+ are easier to understand, and the future direction of the system easier to
+ imagine.
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]> Chapter I : Raison d'etre
+ 
+ In the beginning was the ARPANET. It was beautiful. Packets flowed. And all
+ you needed to know was the address of each and every node you wanted to
+ communicate with.
+ 
+ Ouch.
+ 
+ So, soon thereafter, came the hostname. A lovely thing, the hostname
+ represented a massive convenience for system admninistrators and operators,
+ allowing them to specify the "name" of a node rather than having to know
+ the address associated with it. Easy to remember and convenient, these names
+ were stored in a local file that the administrator could edit and everyone
+ could access for their simplified networking. Nice.
+ 
+ But soon users came back with problems, as they always do.
+ 
+ How do we keep track of internet addresses for non-local nodes? For systems
+ inside of the local network, it's easy. Just yell at your administrator if
+ the names go out of date. But it's hard to yell at the guy that changed the
+ address of some resource half the continent away.
+ 
+ So, a group is created, or created itself and everyone else just sort of
+ deferred to them since no one else wanted to do it, that was responsible for
+ keeping track of hostnames across ARPANET. This group was known as the Network
+ Information Center ( NIC ), and was established in 1972 by Elizabeth Feinier
+ as part of the Stanford Reseach Institute ( SRI ).
+ 
+ ** RFC 606
+ 
+ In December 1973 Peter Deutsch published [RFC-606].
+   
+   "Now that we have an official list of host name, it seems about time
+   to put an end to the absurd situation where each site on the network
+   must maintain a different, generally out-of-date, host list for the 
+   use of its own operating system or user programs
+ 
+ It turns out that trying to keep track of global changes from distributed
+ sites is a problem that no amount of yelling at your local administrator
+ will fix.
+ 
+   "... each of the TENEX sites to which I have access [snip list] has a
+   slightly different mapping between host names and host addresses: none
+   is complete, and I believe each one differs in some way from the official
+   List [sic].
+ 
+ Peter goes on to suggest that the NIC should begin offering the official list
+ of internet nodes as an on-line file. Beyond simple host->address information,
+ he also suggests adding a variety of technical information regarding services
+ offered, servers run at a site, the size of bytes in an ftp transfer, etc.
+ 
+ Importantly, he suggests the use of a plain ASCII file for storing the
+ information to ease compatibility between the disparate systems in use at
+ the time, with a single footnote. Apparently there was some amount of
+ disagreement over what line terminator to use since opinions differed at the
+ time. Luckily, we have that all sorted out these days.
+ 
+ ** RFC 608
+ 
+ Agreeing with Peter's proposal, the NIC issued its own RFC indicating how
+ they intended on implementing this ARPANET wide naming system. Discussing
+ what constituts a hostname, how host attributes will be represented in the
+ final ASCII file, and importantly, specifying where one might get this
+ file of files.
+ 
+   "... Host OFFICE-1 (Host Address = 43 decimal), and will have pathname
+       <NETINFO>HOSTS.TXT"
+ 
+ They go on to specify the FTP user and pass anonymous systems on the ARPANET
+ might use to download this official node list.
+ 
+ And so that was the original method for distributing host names online.
+ Store them all in a text file and FTP it to a local site once a week or so.
+ 
+ But it wouldn't last.
+ 
+ ** RFC 810
+ 
+ Skipping ahead we find that by 1982 the old ARPANET list isn't quite handling
+ things as well as would be hoped. Having left behind the quaint ARPANET
+ and moved onto the Department of Defense's new internetworking protocol known
+ as Internet Protocol (IP), new functionality would be needed. With 32 bit
+ "IP addresses" allowing for more than four billion nodes ( plenty enough for
+ all computers that would ever be networked together into perpetuity ), this
+ new Internet was strictly controlled. If you wanted to put a new host online,
+ you simply emailed or called NIC to get an IP address and register the name
+ associated with it.
+ 
+ EzPz.
+ 
+ This new format dropped many of the ARPANETs attributes, which would not be
+ needed under the new internetworking system, but retained additional
+ information specifying the cpu type, operating system, and service name of
+ the systems listed.
+ 
+ Address distribution was still done by FTP and still called HOSTS.TXT, though
+ hosting would move to a new node, one with an Internet Protocol address.
+ 
+ ** RFC 881
+ 
+ The administrative burden of keeping up with this ever growing and constantly
+ changing file continued to grow along with the nascent Internet. Soon, the 
+ first plans emerged for a system of breaking the host naming responsibilities
+ into "domains" based on administrative authority and responsibility rather
+ than handling everything in a localized manner.
+ 
+ This RFC details plans to roll out and test these "domain name" servers first
+ on the ARPANET, then on the DoD Internet once the technology had been proved.
+ Interesting new features are planned, like being able to email based on the
+ addresses associated with a domain instead of emailing users on specific hosts.
+ 
+ These domains will be added by separating them from the hosts by using a then
+ illegal "." to separate the host and domain portion of the names.
+ 
+ Plans are drawn up to transform the old HOSTS.TXT into the new system by
+ adding all hosts currently in it to a ".ARPA" top level domain. In order to
+ make transition as simple as possible, it is noted that most systems have a
+ library or system call that is used to resolve host name to address using
+ the local copy of HOSTS.TXT. It should be easy enough to rewrite that portion
+ of the code outside the programs to intercept these calls and dispatch the
+ lookups to waiting "resolvers" on the network.
+ 
+ ** RFC 921
+ 
+ Revising the previous RFC's release schedule, this RFC is the first to refer
+ to the Domain Name System (DNS) as such.
+ 
+ Going further into depth on the complexities of converting the current simple
+ name system into the planned domain name system, the RFC pushes back
+ deployment by a further year for the ARPANET.
+ 
+ Discussion of how indirect domain mailing will work is found here as well,
+ referring to without naming the MX record functionality in DNS.
+ 
+ And so DNS was created.
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]> Chapter II : Form and Function
+ 
+ The purpose of the DNS system is to figure out what server has the record a
+ client is looking for and to send that record to the searching client.
+ 
+ To this end, DNS effectively acts as a large key value store. But unlike your
+ average key value store, the system has millions and millions of operators each
+ running their own servers to host their section of the keyspace. Instead of a
+ centralized server to keep track of the keyspace delegations, DNS arranges
+ domains in a heirarchical manner, with higher level domains telling clients
+ where the next lower one each step of the way.
+ 
+ At the very top are the "root" servers of DNS. These systems tell where to
+ find the name servers of the "top level domain" servers. From there, a client
+ can work its way down the chain to the record they want.
+ 
+ In order to use DNS, you have to know who the root servers are. Once you do,
+ the entire system is open to you.
+ 
+ ** An Example Query
+ 
+ We're going to gloss over irrelevant details for a bit here, and then come
+ back to them when we can better understand why they are important.
+ 
+ Let's say you wish to load a webpage from www.google.com.
+ 
+ First things first. We write domain names in the opposite order as the
+ heirarchy. So the components in heirarchical order are
+ 
+   .
+   com.
+   google.
+   www.
+ 
+ "." represents the root name servers, who we need to know to use DNS at all,
+ so we can assume we know them. So the first query is to them.
+   
+   dig @a.root-servers.net www.google.com.
+   
+   DNS-RESPONSE
+   AUTHORITY
+     com.  172800 IN NS e.gtld-servers.net.
+     ...
+   ADDITIONAL
+     e.gtld-servers.net 172800 IN A    192.12.94.30
+     e.gtld-servers.net 172800 IN AAAA 2001:502:1ca1::30
+     ...
+ 
+ The records for "www.google.com." are not stored on the root server. However,
+ the root servers do know who is responsible for handling the "com." domain.
+ So they send us records pointing us towards those servers.
+ 
+ So we need to check with e.gtld-servers.net ( or one of the other returned 
+ name servers ).
+   
+   dig @e.gtld-servers.net www.google.com.
+   
+   DNS-RESPONSE
+   AUTHORITY
+     google.com 172800 IN NS ns2.google.com.
+     ...
+   ADDITIONAL
+     ns2.google.com. 172800 IN A 216.239.34.10
+     ...
+ 
+ The "com." name servers also do not store records for "www.google.com".
+ However, like the "." servers, they know the server they delegate those
+ domains to. In this case, "ns2.google.com" is among the servers responsible
+ for the "google.com" delegation. So we now query them.
+   
+   dig @ns2.google.com www.google.com.
+   
+   DNS-RESPONSE
+   ANSWER
+     www.google.com. 300 IN A 172.217.12.100
+ 
+ And there we have it. We now know the IP address of www.google.com and can
+ create a TCP connection to port 80, and fetch the webpage we want.
+ 
+ ** Recursion : did you mean http://www.google.com/search?q=recursion ?
+ 
+ Doing the above can be a fairly slow process, and if every client on the
+ internet had to do it every time they needed a record, the internet would
+ be dog slow.
+ 
+ Luckily, there is a third component in the Domain Name System to assist in the
+ lookup process.
+ 
+ A recursive DNS server is responsible for doing the above on behalf of
+ clients. A recursive server will generally cache the response to a query
+ for a while, to speed responses to later queries. This caching behavior is
+ built into the DNS record format, and every record will come with a Time To
+ Live (TTL) value that indicates how long it should be cached before another
+ lookup is attempted. This system of caching resolvers around the internet
+ drastically lowers the number of queries required to keep DNS operating for
+ the billions of nodes on the internet.
+ 
+ # Some DNS resolvers can perform special functions, such as redirecting
+ # queries directed towards servers known to be malicious. Users heading to
+ # known bad actors can be redirected to warning sites indicating that the
+ # site is inaccessable and why, perhaps offering a bypass options.
+ 
+ ** Form Follows Function
+ 
+ Now that you know the basic manner that records are looked up it's time to     
+ discuss some of what makes up a DNS Query and a DNS Response.
+ 
+ First off, while DNS can happen over TCP, the vast, vast majority of all DNS
+ traffic is sent via UDP protocol. For those without experience writing
+ protocols, the main difference between these two is that TCP offers a stream
+ of bytes to read off of on either side, while UDP offers discrete messages
+ ( called datagrams in jargon ).
+ 
+ # if you ever see anyone write code that waits for a TCP read and then just
+ # does something with it assuming they've received "the packet" they were
+ # waiting for, you need to smack them, because that's how all manner of
+ # errors happens. TCP means reading and counting bytes received until you
+ # get how many you want. UDP either shows up or is lost in the wilds of the
+ # internet.
+ 
+ These UDP packets have the following structure
+ 
+   DNS Packet Header
+   DNS Questions Records
+   DNS Answer Records
+   DNS Authority Records
+   DNS Additional Records
+ 
+ The header contains a bunch of options. Things like the message id ( used to
+ correlate query packets with their response packets ), whether the packet is
+ a query or a response, whether the answer is being sent from an authoritative
+ server for the domain, whether the packet was truncated, whether the client was
+ asking for the name server to handle the query recursively, and whether the
+ server supports such.
+ 
+ The other four components hold the various records that DNS can transmit.
+ 
+ Question records have a special format and are used to indicate the host name
+ and type of record desired.
+ 
+ The Answer, Authority and Additional records all have the same format, but
+ are used differently.
+ 
+ The Answer section will contain records that are relevant to the query given
+ by the user. If the user wants an IPv4 addres, then the "A" record that
+ contains that address will be found here on a successful response.
+ 
+ The Authority section contains "NS" ( name server ) records indicating where
+ the name server for any specific domain should be looked for next ( it may
+ further forward the client to another name server and so on ).
+ 
+ The Additional section holds information needed to make sense of data in the
+ other sections. For example, if the name server for "google.com" is
+ "ns1.google.com", how can you find its "A" record to get its address? You
+ would need to query that address to find out what it is. The answer is that
+ when a name server instructs a client to delegate a query to another name
+ server it sends not just the NS record in the authority section to indicate
+ what name server to check next, but also includes the "A" and "AAAA" records
+ of that name server in the additional section, giving the client the
+ information it needs to continue the query.
+ 
+ ** Types of Records
+ 
+ The DNS system isn't limited to answering questions about ip addresses.
+ 
+ Instead, there are a large variety of record types that can be requested
+ through the Domain Name System, allowing for all manner of interesting and
+ useful functionality to be built atop it.
+ 
+ Something mentioned way back in the history section is the ability to inform
+ a client how to email a domain. So, how?
+ 
+ Well, there exists a record type, the "MX" ( for Mail eXchange ) record. This
+ record indicates the name ( not IP ) of a mail server that can receive email
+ for the domain queried. Multiple servers can be, and frequently are, returned.
+ MX records support an extra bit of information in the record called the
+ priority, indicating to clients the domain's preference for what order they
+ try the mail servers.
+ 
+ There are many, many record types. Some are experimental, some obsolete.
+   
+ Here is a listing of common record types.
+   
+   A     :: holds a 32bit IP address
+   AAAA  :: the same as A records, but for IPv6 addresses instead of IPv4
+   NS    :: holds a hostname. used to indicate the name server responsible
+            for knowing the records for a given domain
+   CNAME :: holds a hostname. indicates that the client should query the
+            name given and use records from the given domain as though
+            given by the one queried. ( basically a DNS redirect ).
+   SOA   :: start of authority. used to transmit information about the
+            domain itself. The administrators email address and the serial
+            number ( used for versioning ) of the domain are returned.
+   PTR   :: returns a hostname. used most frequently to handle so-called
+            reverse DNS, where the domain associated with a given IP address
+            is looked up
+   MX    :: as stated, yields a hostname and priority indicating where the
+            mail exchange server for a domain located
+   TXT   :: returns generic textual data. used for many types of applications.
+            examples are SPF records ( used to indicate servers that can send
+            email on behalf of a domain ( not always the same as receivers ))
+            or DKIM, which can be used to send a public key used to
+            cryptographically verify the content of a message was written by
+            a given sender.
+ 
+ There are many, many more.
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]> Chapter III : Surviving The Subtle Art of Destroying the Internet
+ 
+ DNS is a massive system, and it powers the whole of the Internet as we know it
+ today. That makes it a wonderful target for those that would like to see
+ parts of that system torn down or conveniently altered against the wishes of
+ those officially authorized to make changes to it.
+ 
+ How nice would it be to secretly intercept all of the traffic someone sends
+ to a given domain, asking users for their user names and password, banking
+ on the fact that most of them will ignore any errors the browsers present
+ regardless of the number of flash lights and screaming klaxons?
+ 
+ Plenty of bad actors would like to be able to lie to you about the location
+ and contents of the records and hosts you seek. It was surprisingly easy for
+ a long time. DNS was born into the ARPANET, a small network of trusted hosts.
+ Bad actors weren't a factor in the world that DNS was created in, which left
+ its protocols relatively easy to subvert.
+ 
+ So let's look at some of the fun ways people have broken DNS and exploited
+ DNS over time.
+ 
+ *  The Man in the Middle and DNS Hijacking
+ 
+ Firstly, DNS had no authentication mechanism. If you could sit a man in the
+ middle, they can intercept every query and send responses that tell your
+ client anything they want it to believe. You are completely at the mercy of
+ your ISP, your IT staff and anyone else that can sit between you and the DNS
+ server you want to query.
+ 
+ Some ISPs and DNS providers have also used their man-in-the-middle position
+ to replace NXDOMAIN ( non-existant domain responses ) with ad servers.
+ Wikipedia has a short, but likely incomplete, list of providers that have
+ done so. So as long as you avoid AT&T, Cablevision's Optimum Online, Comcast,
+ CenturyLink, Time Warner, Cox Communications, RCN, Rogers, Charter
+ Communications, Plusnet, Verizon, Sprint, T-Mobile US, Virgin Media, Frontier
+ Communications, Bell Sympatico, UPC, T-Online, Optus, Mediacom, ONO, TalkTalk,
+ Bigpond ( Telstra ), TTNET and Turksat, you should be fine. The good news is
+ that most of them only do NXDOMAIN replacement and other interceptions on
+ traffic explicitly sent to them ( the default they send in their DHCP
+ options ), and you can change to Comodo, Google or OpenDNS public resolvers.
+ 
+ ! Comodo's public resolver utilizes this position to block known malicious
+ ! domains as well. If you sign up, you can override this, configure other
+ ! categories of domains to block, and use whitelists and blacklists to do
+ ! configure explicit blocks. ( in full disclosure: this is what I do )
+ 
+ Trojan horses and computer viruses have been seen to take over client DNS
+ and redirect it to their own servers, allowing them to intercept traffic
+ or redirect it at will. Probably block access to windows update and removal
+ software while they're at it. Why not?
+ 
+ Oops.
+ 
+ There are two new additions to DNS meant to defeat this kind of
+ man-in-the-middle interference. DNSSEC and DnsCrypt have created methods to
+ verify and encrypt DNS queries and responses, respectively. DNSSEC uses
+ special signing keys that can be verified from the root servers down, and
+ DNSCrypt uses client and server keys to encrypt traffic a hop at a time. The
+ two systems are compatible, and both can be used simultanesouly to create
+ strongly trusted private results from the previously unsecured DNS system.
+ 
+ * DNS Spoofing, Cache Poisoning Via Response Spamming
+ 
+ A lot of servers also tended to bind a single port that would be used for
+ issuing all of the packets out to various servers during resolution.
+ 
+ You could figure out what port was used by asking the server to get a record
+ from a name server you control. Once that is known, you start asking for a
+ record you want to poison to give a false answer. UDP messages are cheap and
+ easy to forge, so you can just forge an answer from the server you know they'll
+ query, and if you run it long enough, eventually the server will accidentally
+ accept one of your false answers. There is a message ID on every outgoing query
+ that must be present in the response, but it's only 2^16 bits. Sending 65,536
+ packets of about 40 bytes every second would only cost you about 2MB/s of
+ traffic.
+ 
+ Oops.
+ 
+ This can be mitigated in a few ways. Firstly, using multiple outgoing IP/ports
+ makes spoofing responses immediately harder. Second, though DNS is a case-
+ insensitive system, when a response is crafted, servers and resolvers will
+ always write the domain name using the same capitalization as the client in the
+ request. By purposefully randomly mixing case, it makes it harder for the
+ attacker to spoof the responses.
+ 
+ * DNS Spoofing, Cache Poisoning Via Trust Exploitation
+ 
+ Remember those glue records from above, that helpfully provided the IP
+ addresses of the name servers that otherwise couldn't have been reached.
+ Not all DNS implementations thought to check that the A records provided
+ matched the domain being queried for.
+   
+   dig @target.name-server.lol evil.example.net.
+   
+   DNS-RESPONSE
+   AUTHORITY
+     evil.example.net. 3600 IN NS ns.google.com.
+   ADDITIONAL
+     ns.google.com. A 1.2.3.4
+   
+ Hmm. This NS record isn't under the requested domain at all, and if trusted,
+ would rewrite the NS record in the receiving server for google.com's name
+ server. Suddenly, evil.example.net is in control of the entire google.com
+ domain. And once the record is in there, the server will keep serving it
+ until its TTL expires.
+ 
+ Oops.
+ 
+ This has since been fixed by requiring a resolvers and clients to check that
+ the records in the ADDTIONAL section are actually under the ones in the
+ AUTHORITY and related under the QUESTION's domain as well.
+ 
+ ( if your name server isn't under your own domain, these glue records aren't
+   needed in the first place
+ )
+ 
+ * Rebinding Attacks
+ 
+ For the web devs in the room, it will be common knowledge that when a webpage
+ issues a request of a resource, the javascript on that page can only see the
+ loaded data if it comes from the same source. This is useful to keep a web
+ page you go to from loading up random bits of information from around the
+ web.
+ 
+ Malicious servers have been seen to set a very low TTL on responses, then send
+ a background response after loading, then send a different IP when the domain
+ is resolved again during the background request, allowing the server to
+ redirect its Same-Origin safe query to a different origin.
+ 
+ Oops.
+ 
+ This can be defeated in the browsers by "pinning" the IP initially used to
+ load a webpage for the duration of time spent on it, rather than depending
+ on the client DNS, which might forget it in the interim.
+ 
+ * Never Trust User Data
+ 
+ DNS comes with a special way to compress hostnames, since they tend to be
+ repeated many times in a packet, which needs to stay under 512 bytes in
+ order to zip around with impunity on the internet.
+ 
+ Each label in a hostname is prefixed with a byte indicating its size. In
+ order to effect compression, a special byte can be placed followed by an
+ offset. That offset is from the beginning of the packet, and points to the
+ next label in the hostname. This means if I have mentions of 
+ "001.long-name.example.com" through "010.long-name.example.com", the packet
+ needs only have the labels for "long-name.example.com" mentioned once, with
+ all of them other names pointing back to it.
+ 
+ On the other hand, if it a label points at the label before it, well, I hope
+ you weren't using a recursive function to follow the labels.
+ 
+ * Amplification Attacks
+ 
+ The internet is well known as a massive echo chamber. As it turns out, you can
+ use this for your own evil ends.
+ 
+ By forging the address to send the response to, you can have your responses
+ sent to whatever address you want. If you make sure to use a small query that
+ asks for a large response, you can bounce a small amount of traffic off of
+ public internet systems, and they will send a massive amount of information
+ to your unsuspecting target.
+ 
+ Wikipedia, citing a paper by "van Rijswiijk-Deij, Roland (2014)" indicates
+ that traffic can be amplified by as much as 179 times doing this. So, if you
+ have a botnet with 10G/s of upload, you could generate a 1.8T/s of data to
+ the target of your choice.
+ 
+ Unfortunately, this problem is largely still a reality. ISPs and IT staffs
+ can mitigate trouble from clients on their networks by deep packet inspection
+ and dropping DNS packets with forged return addresses, but even if half of
+ them did this, it would leave billions of nodes ready for sending such messages
+ out onto the net.
+ 
+ -.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'`'-.,.-'
+ 
+ ]> Chapter IV : Serving the World
+ 
+ DNS does a lot more than just convert names into hosts these days and will only
+ do more going forward. A worldwide automatically cached database can be a
+ useful tool for a lot of applications.
+ 
+ * TXT SPF records
+ 
+ Email spoofing can be a big problem. Sending emails that appear to be
+ legitimate requests from companies to log in and make some update or a change.
+ 
+ Naturally these spoofed emails are designed to steal the credentials from
+ users for all manner of nefarious plot.
+ 
+ Wouldn't it be nice if you could verify what servers were legitimately allowed
+ to send email on behalf of a given company or domain?
+ 
+ SPF records are precisely this. Just as MX records specify where to send email
+ for a domain, SPF records specify who may send on behalf of them. Nearly all
+ major email providers support this functionality at this point, and failing to
+ have an SPF record to indicate who can send on your companies behalf is an
+ excellent way to end up in spam folders worldwide.
+ 
+ * TXT DKIM records
+ 
+ Once you know who can send, how can you verify the contents of those messages
+ to ensure that a helpful man-in-the-middle attack hasn't left you with a 
+ forged message in your inbox?
+ 
+ DKIM provides a key infrastructure via DNS that allows users to verify message
+ contents. Publishing public keys via DNS, the receipient can grab those keys
+ for any given user in order to verify that the email they have received was
+ signed by that user. In combination with DNSSEC, it means key distribution for
+ email is now possible.
+ 
+ * CAA records
+ 
+ If I am a bad actor looking to take over your domain, the first thing I'll
+ need to avoid being completely obvious is an SSL certificate for your domain.
+ With plenty of certificate authorities out there, how do they verify who
+ controls a given domain before issuing an SSL certificate for it? How can
+ clients be sure a certificate is issued from an authority the website owner
+ wanted?
+ 
+ These days, the answer is the CAA record. A DNS records that indicates who
+ what certificate authority or authorities are authorized by the domain owner
+ to issue certificates on behalf of their domain.
+ 
+ With DNSSEC spreading further into the infrastructure, ensuring the ability
+ to confidently transmit information from domain owners to the clients
+ accessing them, it wouldn't surprise me at all if at some point in the future
+ our current browsers list of trusted certificate authorities will be replaced
+ by the legitimizing of self-signed certificates verified through the DNS
+ heirarchy, removing the entire industry of trust middlemen from the internet.
+ 
+ * Spamhaus
+ 
+ For almost twenty years, there has been spamhaus. Compiling and distributing
+ lists of known spam origination points, spamhaus protects the internet from
+ the everflowing deludge of spam messages.
+ 
+ What is the best way to distribute block listings to the millions and millions
+ of operators that need that information in order to block spam? To distribute
+ updates to that data?
+ 
+ DNS. By using their DNSBL and DNSWL ( standing for DNS BlackList and DNS
+ WhiteList ) technologies, millions of email servers around the world found
+ a simple and fast way to check if an email was from a known spammer. By
+ distributing via DNS, spamhaus can leverage the massive caching systems in
+ place throughout the internet for hosting their records as well.
+   
+ For example:
+   
+   [you receive an email connection]
+     from 1.2.3.4
+   [reverse the ip address]
+     4.3.2.1
+   [now craft a query to sbl.spamhaus.org]
+     dig 4.3.2.1.sbl.spamhaus.org
+   
+   if you get an NXDOMAIN, the IP is clean
+   if they get an address, it's on the list!
+ 
+ Thanks to DNS caching, repeat attempts from the same IP address won't even
+ have to go all the way to spamhaus, and will be caught by local, network,
+ ISP or public resolvers on the way, reducing their load while still getting
+ the client information to those that need it.
+ 
