@@ -57,6 +57,13 @@
  Information Center ( NIC ), and was established in 1972 by Elizabeth Feinier
  as part of the Stanford Reseach Institute ( SRI ).
  
+ Below I follow the path of DNS' creation via the historic RFC's that defined
+ it. For those unaware, RFCs are the standard way for publishing Internet
+ protocols and standards, started initially by Steve Crocker back in 1969 as
+ a standard way to request comments on the various ideas surrounding the
+ early ARPANET system, with their maintenance falling to the IETF as part of
+ ISOC following the dissolution of the US governments ARPANET funding.
+ 
  ** RFC 606
  
  In December 1973 Peter Deutsch published [RFC-606].
