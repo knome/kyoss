@@ -590,9 +590,8 @@
  
  DKIM provides a key infrastructure via DNS that allows users to verify message
  contents. Publishing public keys via DNS, the receipient can grab those keys
- for any given user in order to verify that the email they have received was
- signed by that user. In combination with DNSSEC, it means key distribution for
- email is now possible.
+ for any given domain in order to verify that the email they have received was
+ signed by that domain, indicating that it was sent from it and not forged.
  
  * CAA records
  
